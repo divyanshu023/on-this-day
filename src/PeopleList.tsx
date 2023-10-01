@@ -26,6 +26,7 @@ interface HeadCell {
   id: keyof Data;
   label: string;
   numeric: boolean;
+  maxWidth?: string;
 }
 
 const headCells: readonly HeadCell[] = [
@@ -34,18 +35,21 @@ const headCells: readonly HeadCell[] = [
     numeric: false,
     disablePadding: true,
     label: "Person",
+    maxWidth: "20%",
   },
   {
     id: "occupation",
     numeric: false,
     disablePadding: false,
     label: "Occupation",
+    maxWidth: "20%",
   },
   {
     id: "descriptor",
     numeric: false,
     disablePadding: false,
     label: "Descriptor",
+    maxWidth: "40%",
   },
   {
     id: "born",
@@ -68,7 +72,9 @@ const PeopleTableHead = (props: PeopleTableHeadProps) => {
 
   const createSortHandler =
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
-      onRequestSort(event, property);
+      if (property === "born") {
+        onRequestSort(event, property);
+      }
     };
 
   return (
@@ -81,9 +87,13 @@ const PeopleTableHead = (props: PeopleTableHeadProps) => {
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
             sx={{ fontWeight: "bold" }}
+            css={{
+              width: headCell?.maxWidth ? `${headCell.maxWidth}` : "auto",
+            }}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
+              hideSortIcon
               direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
             >
@@ -161,10 +171,7 @@ const PeopleList = ({ data }: any) => {
             aria-labelledby="tableTitle"
             size={"medium"}
           >
-            <PeopleTableHead
-              order={order}
-              onRequestSort={handleRequestSort}
-            />
+            <PeopleTableHead order={order} onRequestSort={handleRequestSort} />
             <TableBody>
               {sortedRows?.map((row: Data, index) => {
                 return (
@@ -182,9 +189,9 @@ const PeopleList = ({ data }: any) => {
                     >
                       {row.name}
                     </TableCell>
-                    <TableCell align="right">{row.occupation}</TableCell>
-                    <TableCell align="right">{row.descriptor}</TableCell>
-                    <TableCell align="right">
+                    <TableCell align="left">{row.occupation}</TableCell>
+                    <TableCell align="left">{row.descriptor}</TableCell>
+                    <TableCell align="left">
                       {row.born.toDateString()}
                     </TableCell>
                   </TableRow>
