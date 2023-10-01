@@ -1,15 +1,18 @@
 # 🚀 Welcome to your new awesome project!
 
-This project has been created using **webpack-cli**, you can now run
+
+### Project
+
+Implement a list of today's birthdays using Wikipedia's "On this day" API.
+
+#### Initializing The Repository
+
+- Simply run `yarn` in your development environment, and you're off! 🚀 
+
+## Getting started
 
 ```
-npm run build
-```
-
-or
-
-```
-yarn build
+yarn build:dev
 ```
 
 to bundle your application
