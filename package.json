@@ -1,5 +1,5 @@
 {
-  "name": "my-webpack-project",
+  "name": "on-this-day",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
@@ -46,5 +46,5 @@
     "serve": "webpack serve",
     "test": "jest"
   },
-  "description": "My webpack project"
+  "description": "People born today"
 }
