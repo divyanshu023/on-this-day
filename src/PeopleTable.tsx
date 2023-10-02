@@ -8,7 +8,7 @@ import Paper from "@mui/material/Paper";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Box from "@mui/material/Box";
 import { visuallyHidden } from "@mui/utils";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import TextField from "@mui/material/TextField";
 import debounce from "lodash.debounce";
@@ -53,10 +53,7 @@ const headCells: readonly TableHeaderCell[] = [
 ];
 
 interface PeopleTableHeadProps {
-  onRequestSort: (
-    event: React.MouseEvent<unknown>,
-    property: keyof TableData
-  ) => void;
+  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof TableData) => void;
   order: Order;
 }
 
@@ -66,8 +63,8 @@ interface PeopleTableHeadProps {
  * @returns
  */
 const PeopleTableHead = ({ onRequestSort, order }: PeopleTableHeadProps) => {
-  const createSortHandler =
-    (property: keyof TableData) => (event: React.MouseEvent<unknown>) => {
+  
+  const createSortHandler = (property: keyof TableData) => (event: React.MouseEvent<unknown>) => {
       if (property === "born") {
         onRequestSort(event, property);
       }
@@ -107,29 +104,6 @@ const PeopleTableHead = ({ onRequestSort, order }: PeopleTableHeadProps) => {
   );
 };
 
-interface Person {
-  year: number;
-  text: string;
-  pages: unknown[];
-}
-
-const getNormalizedData = (data: unknown[]): TableData[] => {
-  // @ts-ignore
-  return data?.births?.map((person: Person) => {
-    const birthDate = new Date();
-    birthDate.setFullYear(person?.year as number);
-    return {
-      // @ts-ignore
-      name: person?.pages[0].normalizedtitle,
-      // @ts-ignore
-      descriptor: person?.pages[0].extract,
-      // @ts-ignore
-      occupation: person?.pages[0].description,
-      born: birthDate,
-    };
-  });
-};
-
 /**
  * Table Skelton Component, renders `rownNum` skelton rows
  * @param rownNum
@@ -165,11 +139,8 @@ const TableRowsSkelton = ({ rowsNum }: { rowsNum: number }) => {
  * @param filterFunction 
  * @returns 
  */
-const TableToolbar = ({
-  onRequestFilter,
-}: {
-  onRequestFilter: (searchString: string) => void;
-}) => {
+const TableToolbar = ({onRequestFilter}: {onRequestFilter: (searchString: string) => void;}) => {
+  
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     debouncedSearch(event.target.value);
   };
@@ -190,13 +161,35 @@ const TableToolbar = ({
 };
 
 /**
+ * Converts Wiki API data to format of TableData
+ * @param data 
+ * @returns 
+ */
+const getNormalizedData = (data: unknown[]): TableData[] => {
+  // @ts-ignore
+  return data?.births?.map((person: unknown) => {
+    const birthDate = new Date();
+      // @ts-ignore
+    birthDate.setFullYear(person?.year as number);
+    return {
+      // @ts-ignore
+      name: person?.pages[0].normalizedtitle,
+      // @ts-ignore
+      descriptor: person?.pages[0].extract,
+      // @ts-ignore
+      occupation: person?.pages[0].description,
+      born: birthDate,
+    };
+  });
+};
+/**
  * People Table Component.
  * Renders a PeopleTableHead component along with the body
  * @param data
  * @param loading
  * @returns
  */
-const PeopleTable = ({ data, loading }: any) => {
+const PeopleTable = ({ data, loading }: {data: unknown[], loading: boolean}) => {
   const [order, setOrder] = useState<Order>("desc");
   const [searchString, setSearchString] = useState<string>("");
 
@@ -214,7 +207,6 @@ const PeopleTable = ({ data, loading }: any) => {
     setSearchString(filterString);
   };
 
-  //@ts-ignore
   const sortedRows: TableData[] = useMemo(() => {
      // ✅ Does not re-run unless data/order changes
     const sortDataByDate = (data: TableData[]) =>
