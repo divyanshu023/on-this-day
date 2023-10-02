@@ -134,7 +134,7 @@ const getNormalizedData = (data: unknown[]): TableData[] => {
  * @param rownNum
  * @returns 
  */
-const TableRowsLoader = ({ rowsNum }: { rowsNum: number }) => {
+const TableRowsSkelton = ({ rowsNum }: { rowsNum: number }) => {
   return (
     <>
       {[...Array(rowsNum)].map((row, index) => {
@@ -211,9 +211,7 @@ const PeopleTable = ({ data, loading }: any) => {
           >
             <PeopleTableHead order={order} onRequestSort={handleRequestSort} />
             <TableBody>
-              {loading ? (
-                <TableRowsLoader rowsNum={10} />
-              ) : (
+              {loading ? ( <TableRowsSkelton rowsNum={10} />) : (
                 sortedRows?.map((row: TableData, index) => {
                   return (
                     <TableRow
