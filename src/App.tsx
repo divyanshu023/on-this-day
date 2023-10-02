@@ -8,9 +8,13 @@ import { PeopleList } from "./PeopleList";
 
 const App = () => {
 
-  const [data, setData] = useState<unknown[]>()
+  const [data, setData] = useState<unknown[]>(null)
+  const [loading, setLoading] = useState(false)
+
+  const showTable = data || loading
 
   const findPeople = () => {
+    setLoading(true)
     let today = new Date();
     let month = String(today.getMonth() + 1).padStart(2, "0");
     let day = String(today.getDate()).padStart(2, "0");
@@ -19,8 +23,7 @@ const App = () => {
     wretch(url)
       .get()
       .json((json) => {
-        // Do stuff with the parsed json
-        console.log(json)
+        setLoading(false)
         setData(json)
       });
   };
@@ -28,14 +31,14 @@ const App = () => {
     <>
       <Box sx={{ width: "100%", maxWidth: 500, gap: 2, m: 4 }}>
         <Typography variant="h4" gutterBottom>
-          People born today
+          People born today!!
         </Typography>
         <Button variant="contained" onClick={findPeople}>
-          Find people!!
+          Lets Find people
         </Button>
       </Box>
       <Divider />
-      {data && <PeopleList data={data}/>}
+      {showTable && <PeopleList data={data} loading={loading}/>}
     </>
   );
 };

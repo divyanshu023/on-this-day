@@ -9,6 +9,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Box from "@mui/material/Box";
 import { visuallyHidden } from "@mui/utils";
 import { useMemo, useRef, useState } from "react";
+import Skeleton from "@mui/material/Skeleton";
 
 type Order = "asc" | "desc";
 
@@ -133,8 +134,32 @@ const getNormalizedData = (data: unknown[]): Data[] => {
     };
   });
 };
+const TableRowsLoader = ({ rowsNum }: { rowsNum: number }) => {
+  return (
+    <>
+      {[...Array(rowsNum)].map((row, index) => {
+        return (
+          <TableRow key={index}>
+            <TableCell component="th" scope="row">
+              <Skeleton animation="wave" variant="text" />
+            </TableCell>
+            <TableCell>
+              <Skeleton animation="wave" variant="text" />
+            </TableCell>
+            <TableCell>
+              <Skeleton animation="wave" variant="text" />
+            </TableCell>
+            <TableCell>
+              <Skeleton animation="wave" variant="text" />
+            </TableCell>
+          </TableRow>
+        );
+      })}
+    </>
+  );
+};
 
-const PeopleList = ({ data }: any) => {
+const PeopleList = ({ data, loading }: any) => {
   const [order, setOrder] = useState<Order>("desc");
 
   const normalizeData = useMemo(() => {
@@ -145,7 +170,7 @@ const PeopleList = ({ data }: any) => {
   //@ts-ignore
   const sortedRows: Data[] = useMemo(() => {
     const sortDataByDate = (data: Data[]) =>
-      data.sort((date1: Data, date2: Data) => {
+      data?.sort((date1: Data, date2: Data) => {
         if (order === "desc") {
           return date2.born.getTime() - date1.born.getTime();
         } else {
@@ -154,7 +179,7 @@ const PeopleList = ({ data }: any) => {
       });
 
     return sortDataByDate(normalizeData);
-  }, [order]);
+  }, [order, data]);
 
   const handleRequestSort = (event: React.MouseEvent<unknown>) => {
     const isAsc = order === "asc";
@@ -173,30 +198,34 @@ const PeopleList = ({ data }: any) => {
           >
             <PeopleTableHead order={order} onRequestSort={handleRequestSort} />
             <TableBody>
-              {sortedRows?.map((row: Data, index) => {
-                return (
-                  <TableRow
-                    hover
-                    tabIndex={-1}
-                    key={row.name}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <TableCell
-                      component="th"
-                      id={`$index`}
-                      scope="row"
-                      padding="none"
+              {loading ? (
+                <TableRowsLoader rowsNum={10} />
+              ) : (
+                sortedRows?.map((row: Data, index) => {
+                  return (
+                    <TableRow
+                      hover
+                      tabIndex={-1}
+                      key={row.name}
+                      sx={{ cursor: "pointer" }}
                     >
-                      {row.name}
-                    </TableCell>
-                    <TableCell align="left">{row.occupation}</TableCell>
-                    <TableCell align="left">{row.descriptor}</TableCell>
-                    <TableCell align="left">
-                      {row.born.toDateString()}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                      <TableCell
+                        component="th"
+                        id={`$index`}
+                        scope="row"
+                        padding="none"
+                      >
+                        {row.name}
+                      </TableCell>
+                      <TableCell align="left">{row.occupation}</TableCell>
+                      <TableCell align="left">{row.descriptor}</TableCell>
+                      <TableCell align="left">
+                        {row.born.toDateString()}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
             </TableBody>
           </Table>
         </TableContainer>
