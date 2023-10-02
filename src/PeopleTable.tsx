@@ -15,47 +15,37 @@ type Order = "asc" | "desc";
 
 const orderBy = "born";
 
-interface Data {
+interface TableData {
   name: string;
   descriptor: number;
   occupation: number;
   born: Date;
 }
 
-interface HeadCell {
-  disablePadding: boolean;
-  id: keyof Data;
+interface TableHeaderCell {
+  id: keyof TableData;
   label: string;
-  numeric: boolean;
   maxWidth?: string;
 }
 
-const headCells: readonly HeadCell[] = [
+const headCells: readonly TableHeaderCell[] = [
   {
     id: "name",
-    numeric: false,
-    disablePadding: true,
     label: "Person",
     maxWidth: "20%",
   },
   {
     id: "occupation",
-    numeric: false,
-    disablePadding: false,
     label: "Occupation",
     maxWidth: "20%",
   },
   {
     id: "descriptor",
-    numeric: false,
-    disablePadding: false,
     label: "Descriptor",
     maxWidth: "40%",
   },
   {
     id: "born",
-    numeric: false,
-    disablePadding: false,
     label: "Born",
   },
 ];
@@ -63,16 +53,20 @@ const headCells: readonly HeadCell[] = [
 interface PeopleTableHeadProps {
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof Data
+    property: keyof TableData
   ) => void;
   order: Order;
 }
 
-const PeopleTableHead = (props: PeopleTableHeadProps) => {
-  const { order, onRequestSort } = props;
+/**
+ * People Table Header component. This is a compound component. To be used with People Table Component
+ * @param props 
+ * @returns 
+ */
+const PeopleTableHead = ({ onRequestSort, order }: PeopleTableHeadProps) => {
 
   const createSortHandler =
-    (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof TableData) => (event: React.MouseEvent<unknown>) => {
       if (property === "born") {
         onRequestSort(event, property);
       }
@@ -84,8 +78,8 @@ const PeopleTableHead = (props: PeopleTableHeadProps) => {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? "right" : "left"}
-            padding={headCell.disablePadding ? "none" : "normal"}
+            align={"left"}
+            padding={"normal"}
             sortDirection={orderBy === headCell.id ? order : false}
             sx={{ fontWeight: "bold" }}
             css={{
@@ -118,7 +112,7 @@ interface Person {
   pages: unknown[];
 }
 
-const getNormalizedData = (data: unknown[]): Data[] => {
+const getNormalizedData = (data: unknown[]): TableData[] => {
   // @ts-ignore
   return data?.births?.map((person: Person) => {
     const birthDate = new Date();
@@ -134,6 +128,12 @@ const getNormalizedData = (data: unknown[]): Data[] => {
     };
   });
 };
+
+/**
+ * Table Skelton Component, renders `rownNum` skelton rows
+ * @param rownNum
+ * @returns 
+ */
 const TableRowsLoader = ({ rowsNum }: { rowsNum: number }) => {
   return (
     <>
@@ -159,7 +159,20 @@ const TableRowsLoader = ({ rowsNum }: { rowsNum: number }) => {
   );
 };
 
-const PeopleList = ({ data, loading }: any) => {
+// const TableToolbar = ({
+//   onRequsetFilter
+// }) => {
+
+// }
+
+/**
+ * People Table Component. 
+ * Renders a PeopleTableHead component along with the body
+ * @param data 
+ * @param loading 
+ * @returns 
+ */
+const PeopleTable = ({ data, loading }: any) => {
   const [order, setOrder] = useState<Order>("desc");
 
   const normalizeData = useMemo(() => {
@@ -168,9 +181,9 @@ const PeopleList = ({ data, loading }: any) => {
   }, [data]);
 
   //@ts-ignore
-  const sortedRows: Data[] = useMemo(() => {
-    const sortDataByDate = (data: Data[]) =>
-      data?.sort((date1: Data, date2: Data) => {
+  const sortedRows: TableData[] = useMemo(() => {
+    const sortDataByDate = (data: TableData[]) =>
+      data?.sort((date1: TableData, date2: TableData) => {
         if (order === "desc") {
           return date2.born.getTime() - date1.born.getTime();
         } else {
@@ -201,7 +214,7 @@ const PeopleList = ({ data, loading }: any) => {
               {loading ? (
                 <TableRowsLoader rowsNum={10} />
               ) : (
-                sortedRows?.map((row: Data, index) => {
+                sortedRows?.map((row: TableData, index) => {
                   return (
                     <TableRow
                       hover
@@ -234,4 +247,4 @@ const PeopleList = ({ data, loading }: any) => {
   );
 };
 
-export { PeopleList };
+export { PeopleTable };

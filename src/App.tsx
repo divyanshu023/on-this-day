@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import wretch from "wretch";
 import { useState } from "react";
-import { PeopleList } from "./PeopleList";
+import { PeopleTable } from "./PeopleTable";
 import Alert from "@mui/material/Alert";
 
 
@@ -42,11 +42,11 @@ const App = () => {
           People born today!!
         </Typography>
         <Button variant="contained" onClick={findPeople}>
-          Lets Find people
+          Lets Go
         </Button>
       </Box>
       <Divider />
-      {showTable && <PeopleList data={data} loading={loading}/>}
+      {showTable && <PeopleTable data={data} loading={loading}/>}
       {error && <Alert severity="error">Something went wrong— try again!</Alert>}
     </>
   );
