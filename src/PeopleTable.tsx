@@ -231,7 +231,7 @@ const PeopleTable = ({ data, loading }: any) => {
   }, [order, data]);
 
   const filteredRows = useMemo(() => {
-      // ✅ Does not re-run unless data/searchString changes
+    // ✅ Does not re-run unless data/searchString changes
     if (!searchString) return sortedRows;
     return sortedRows.filter((row: TableData) => {
       return row.name.toLowerCase().includes(searchString.toLowerCase());
@@ -244,7 +244,7 @@ const PeopleTable = ({ data, loading }: any) => {
         sx={{ width: "100%", mb: 2, display: "flex", flexDirection: "column" }}
       >
         {!loading && <TableToolbar onRequestFilter={handleRequestFilter} />}
-        <TableContainer sx={{ maxHeight: 600 }}>
+        <TableContainer data-testid={"people-table"} sx={{ maxHeight: 600 }}>
           <Table
             stickyHeader
             sx={{ minWidth: 750 }}

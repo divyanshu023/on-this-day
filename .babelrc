@@ -2,7 +2,15 @@
   "plugins": ["@emotion/babel-plugin", "@babel/syntax-dynamic-import"],
   "presets": [
     "@babel/preset-typescript",
-    "@babel/preset-env",
+    // "@babel/preset-env",
+    [
+      "@babel/preset-env",
+      { 
+        "targets": {
+          "node": "current"
+        }
+      }
+    ],
     [
       "@babel/preset-react",
       { "runtime": "automatic", "importSource": "@emotion/react" }
