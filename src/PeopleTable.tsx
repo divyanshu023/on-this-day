@@ -8,8 +8,10 @@ import Paper from "@mui/material/Paper";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Box from "@mui/material/Box";
 import { visuallyHidden } from "@mui/utils";
-import { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import Skeleton from "@mui/material/Skeleton";
+import TextField from "@mui/material/TextField";
+import debounce from "lodash.debounce";
 
 type Order = "asc" | "desc";
 
@@ -60,11 +62,10 @@ interface PeopleTableHeadProps {
 
 /**
  * People Table Header component. This is a compound component. To be used with People Table Component
- * @param props 
- * @returns 
+ * @param props
+ * @returns
  */
 const PeopleTableHead = ({ onRequestSort, order }: PeopleTableHeadProps) => {
-
   const createSortHandler =
     (property: keyof TableData) => (event: React.MouseEvent<unknown>) => {
       if (property === "born") {
@@ -132,7 +133,7 @@ const getNormalizedData = (data: unknown[]): TableData[] => {
 /**
  * Table Skelton Component, renders `rownNum` skelton rows
  * @param rownNum
- * @returns 
+ * @returns
  */
 const TableRowsSkelton = ({ rowsNum }: { rowsNum: number }) => {
   return (
@@ -159,29 +160,64 @@ const TableRowsSkelton = ({ rowsNum }: { rowsNum: number }) => {
   );
 };
 
-// const TableToolbar = ({
-//   onRequsetFilter
-// }) => {
+/**
+ * Toolbar to filter the data
+ * @param filterFunction 
+ * @returns 
+ */
+const TableToolbar = ({
+  onRequestFilter,
+}: {
+  onRequestFilter: (searchString: string) => void;
+}) => {
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedSearch(event.target.value);
+  };
 
-// }
+  const debouncedSearch = debounce((filterString) => {
+    console.log(filterString);
+    onRequestFilter(filterString);
+  }, 500);
+
+  return (
+    <TextField
+      id="filter-results"
+      label="Find People"
+      variant="filled"
+      size="medium"
+      onChange={handleSearch}
+    />
+  );
+};
 
 /**
- * People Table Component. 
+ * People Table Component.
  * Renders a PeopleTableHead component along with the body
- * @param data 
- * @param loading 
- * @returns 
+ * @param data
+ * @param loading
+ * @returns
  */
 const PeopleTable = ({ data, loading }: any) => {
   const [order, setOrder] = useState<Order>("desc");
+  const [searchString, setSearchString] = useState<string>("");
 
   const normalizeData = useMemo(() => {
     // ✅ Does not re-run unless data change
     return getNormalizedData(data);
   }, [data]);
 
+  const handleRequestSort = (event: React.MouseEvent<unknown>) => {
+    const isAsc = order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+  };
+
+  const handleRequestFilter = (filterString: string) => {
+    setSearchString(filterString);
+  };
+
   //@ts-ignore
   const sortedRows: TableData[] = useMemo(() => {
+     // ✅ Does not re-run unless data/order changes
     const sortDataByDate = (data: TableData[]) =>
       data?.sort((date1: TableData, date2: TableData) => {
         if (order === "desc") {
@@ -194,14 +230,20 @@ const PeopleTable = ({ data, loading }: any) => {
     return sortDataByDate(normalizeData);
   }, [order, data]);
 
-  const handleRequestSort = (event: React.MouseEvent<unknown>) => {
-    const isAsc = order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-  };
+  const filteredRows = useMemo(() => {
+      // ✅ Does not re-run unless data/searchString changes
+    if (!searchString) return sortedRows;
+    return sortedRows.filter((row: TableData) => {
+      return row.name.toLowerCase().includes(searchString.toLowerCase());
+    });
+  }, [searchString, data]);
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
+      <Paper
+        sx={{ width: "100%", mb: 2, display: "flex", flexDirection: "column" }}
+      >
+        {!loading && <TableToolbar onRequestFilter={handleRequestFilter} />}
         <TableContainer sx={{ maxHeight: 600 }}>
           <Table
             stickyHeader
@@ -211,8 +253,10 @@ const PeopleTable = ({ data, loading }: any) => {
           >
             <PeopleTableHead order={order} onRequestSort={handleRequestSort} />
             <TableBody>
-              {loading ? ( <TableRowsSkelton rowsNum={10} />) : (
-                sortedRows?.map((row: TableData, index) => {
+              {loading ? (
+                <TableRowsSkelton rowsNum={10} />
+              ) : (
+                filteredRows?.map((row: TableData) => {
                   return (
                     <TableRow
                       hover
