@@ -41,7 +41,7 @@ const config = {
     resolve: {
         extensions: [ '.tsx', '.ts', '.js' ],
     },
-    devtool: isProduction? 'none' :'inline-source-map'
+    devtool: isProduction? false :'inline-source-map'
 };
 
 module.exports = () => {

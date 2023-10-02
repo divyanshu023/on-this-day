@@ -5,16 +5,21 @@ import Divider from "@mui/material/Divider";
 import wretch from "wretch";
 import { useState } from "react";
 import { PeopleList } from "./PeopleList";
+import Alert from "@mui/material/Alert";
+
+
 
 const App = () => {
 
   const [data, setData] = useState<unknown[]>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
 
-  const showTable = data || loading
+  const showTable = !error && (data || loading)
 
   const findPeople = () => {
     setLoading(true)
+    setError(false)
     let today = new Date();
     let month = String(today.getMonth() + 1).padStart(2, "0");
     let day = String(today.getDate()).padStart(2, "0");
@@ -25,7 +30,10 @@ const App = () => {
       .json((json) => {
         setLoading(false)
         setData(json)
-      });
+      })
+      .catch((error) => {
+        setError(true)
+      })
   };
   return (
     <>
@@ -39,6 +47,7 @@ const App = () => {
       </Box>
       <Divider />
       {showTable && <PeopleList data={data} loading={loading}/>}
+      {error && <Alert severity="error">Something went wrong— try again!</Alert>}
     </>
   );
 };
