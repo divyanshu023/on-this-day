@@ -175,7 +175,6 @@ const TableToolbar = ({
   };
 
   const debouncedSearch = debounce((filterString) => {
-    console.log(filterString);
     onRequestFilter(filterString);
   }, 500);
 
@@ -289,4 +288,4 @@ const PeopleTable = ({ data, loading }: any) => {
   );
 };
 
-export { PeopleTable };
+export { PeopleTable, TableToolbar, TableRowsSkelton, PeopleTableHead };
